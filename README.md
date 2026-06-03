@@ -64,6 +64,39 @@ set  sink0 [new Agent/TCPSink]
 $ns attach-agent $n3 $sink0 
 #Connect the traffic sources with the traffic sink 
 $ns connect $tcp0 $sink0 
+# CODE 
+
+set ns [new Simulator] 
+#Open the nam trace file 
+set nf [open out.nam w] 
+$ns namtrace-all $nf 
+#Define a 'finish' procedure 
+proc finish {} 
+{ 
+global ns nf 
+$ns flush-trace 
+close $nf 
+#Execute nam on the trace file 
+exec nam out.nam & 
+exit 0 
+} 
+#Create five nodes 
+set n0 [$ns node] 
+set n1 [$ns node] 
+set n2 [$ns node] 
+set n3 [$ns node] 
+set n4 [$ns node] 
+#Create Lan between the nodes 
+set lan0 [$ns newLan "$n0 $n1 $n2 $n3 $n4" 0.5Mb 40ms LL Queue/DropTail MAC/Csma/Cd Channel] 
+#Create a TCP agent and attach it to node n0 
+set tcp0 [new Agent/TCP] 
+$tcp0 set class_ 1 
+$ns attach-agent $n1 $tcp0 
+#Create a TCP Sink agent (a traffic sink) for TCP and attach it to node n3  
+set  sink0 [new Agent/TCPSink] 
+$ns attach-agent $n3 $sink0 
+#Connect the traffic sources with the traffic sink 
+$ns connect $tcp0 $sink0 
 # Create a CBR traffic source and attach it to tcp0 
 set  cbr0 [new Application/Traffic/CBR] 
 $cbr0 set packetSize_ 500 
@@ -75,3 +108,9 @@ $ns at 4.5 "$cbr0 stop"
 #Call the finish procedure after 5 seconds of simulation time 
 $ns at 5.0 "finish" 
 $ns run
+
+# OUTPUT
+
+<img width="1003" height="586" alt="image" src="https://github.com/user-attachments/assets/0673d9d9-e6d0-4057-80b1-5f7d60987ab1" />
+
+<img width="1152" height="648" alt="image" src="https://github.com/user-attachments/assets/fdc183f8-ed40-4fb1-9a99-e61c4d545067" />
